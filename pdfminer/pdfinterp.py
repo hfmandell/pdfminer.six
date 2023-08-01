@@ -134,6 +134,9 @@ class PDFGraphicState:
 
         # non stroking color
         self.ncolor: Optional[Color] = None
+        
+        # OCG (Optional Content Group)
+        self.ocg: str = None
 
     def copy(self) -> "PDFGraphicState":
         obj = PDFGraphicState()
@@ -146,13 +149,14 @@ class PDFGraphicState:
         obj.flatness = self.flatness
         obj.scolor = self.scolor
         obj.ncolor = self.ncolor
+        obj.ocg = self.ocg
         return obj
 
     def __repr__(self) -> str:
         return (
             "<PDFGraphicState: linewidth=%r, linecap=%r, linejoin=%r, "
             " miterlimit=%r, dash=%r, intent=%r, flatness=%r, "
-            " stroking color=%r, non stroking color=%r>"
+            " stroking color=%r, non stroking color=%r, ocg=%r>"
             % (
                 self.linewidth,
                 self.linecap,
@@ -163,6 +167,7 @@ class PDFGraphicState:
                 self.flatness,
                 self.scolor,
                 self.ncolor,
+                self.ocg
             )
         )
 
@@ -766,11 +771,13 @@ class PDFPageInterpreter:
     def do_BMC(self, tag: PDFStackT) -> None:
         """Begin marked-content sequence"""
         self.device.begin_tag(cast(PSLiteral, tag))
+        # self.graphicstate.ocg = tag.name
         return
 
     def do_BDC(self, tag: PDFStackT, props: PDFStackT) -> None:
         """Begin marked-content sequence with property list"""
         self.device.begin_tag(cast(PSLiteral, tag), props)
+        # self.graphicstate.ocg = tag.name
         return
 
     def do_EMC(self) -> None:
@@ -1017,6 +1024,7 @@ class PDFPageInterpreter:
         return
 
     def execute(self, streams: Sequence[object]) -> None:
+        # TODO
         try:
             parser = PDFContentParser(streams)
         except PSEOF:
@@ -1029,6 +1037,7 @@ class PDFPageInterpreter:
                 break
             if isinstance(obj, PSKeyword):
                 name = keyword_name(obj)
+                print(f"Name: {name}")
                 method = "do_%s" % name.replace("*", "_a").replace('"', "_w").replace(
                     "'", "_q"
                 )
@@ -1044,6 +1053,7 @@ class PDFPageInterpreter:
                         log.debug("exec: %s", name)
                         func()
                 else:
+                    print(f"UNRECOGNIZED KEYWORD: {name}")
                     if settings.STRICT:
                         error_msg = "Unknown operator: %r" % name
                         raise PDFInterpreterError(error_msg)
