@@ -199,8 +199,6 @@ def extract_pages(
     """
     if laparams is None:
         laparams = LAParams()
-        
-    print("IN EXTRACT PAGES METHOD - 2")
 
     with open_filename(pdf_file, "rb") as fp:
         fp = cast(BinaryIO, fp)  # we opened in binary mode

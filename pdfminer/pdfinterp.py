@@ -771,13 +771,13 @@ class PDFPageInterpreter:
     def do_BMC(self, tag: PDFStackT) -> None:
         """Begin marked-content sequence"""
         self.device.begin_tag(cast(PSLiteral, tag))
-        # self.graphicstate.ocg = tag.name
         return
 
     def do_BDC(self, tag: PDFStackT, props: PDFStackT) -> None:
         """Begin marked-content sequence with property list"""
         self.device.begin_tag(cast(PSLiteral, tag), props)
-        # self.graphicstate.ocg = tag.name
+        # Set graphic state OCG attribute 
+        self.graphicstate.ocg = str(props).strip('/')
         return
 
     def do_EMC(self) -> None:
@@ -988,7 +988,7 @@ class PDFPageInterpreter:
             # unsupported xobject type.
             pass
         return
-
+    
     def process_page(self, page: PDFPage) -> None:
         log.debug("Processing page: %r", page)
         (x0, y0, x1, y1) = page.mediabox
@@ -1037,7 +1037,6 @@ class PDFPageInterpreter:
                 break
             if isinstance(obj, PSKeyword):
                 name = keyword_name(obj)
-                print(f"Name: {name}")
                 method = "do_%s" % name.replace("*", "_a").replace('"', "_w").replace(
                     "'", "_q"
                 )
@@ -1053,7 +1052,6 @@ class PDFPageInterpreter:
                         log.debug("exec: %s", name)
                         func()
                 else:
-                    print(f"UNRECOGNIZED KEYWORD: {name}")
                     if settings.STRICT:
                         error_msg = "Unknown operator: %r" % name
                         raise PDFInterpreterError(error_msg)
