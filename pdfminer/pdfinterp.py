@@ -444,9 +444,14 @@ class PDFPageInterpreter:
         return
 
     def do_Q(self) -> None:
-        """Restore graphics state"""
+        """
+        Restore graphics state
+        But maintain the freshly declared OCG (layer group)
+        """
+        curr_ocg = self.graphicstate.ocg
         if self.gstack:
             self.set_current_state(self.gstack.pop())
+        self.graphicstate.ocg = curr_ocg
         return
 
     def do_cm(
@@ -776,7 +781,7 @@ class PDFPageInterpreter:
     def do_BDC(self, tag: PDFStackT, props: PDFStackT) -> None:
         """Begin marked-content sequence with property list"""
         self.device.begin_tag(cast(PSLiteral, tag), props)
-        # Set graphic state OCG attribute 
+        # Set graphic state OCG (layer) attribute 
         self.graphicstate.ocg = str(props).strip('/')
         return
 
@@ -1024,7 +1029,6 @@ class PDFPageInterpreter:
         return
 
     def execute(self, streams: Sequence[object]) -> None:
-        # TODO
         try:
             parser = PDFContentParser(streams)
         except PSEOF:
