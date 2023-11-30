@@ -134,9 +134,10 @@ class PDFGraphicState:
 
         # non stroking color
         self.ncolor: Optional[Color] = None
-        
+
         # OCG (Optional Content Group)
         self.ocg: str = None
+
 
     def copy(self) -> "PDFGraphicState":
         obj = PDFGraphicState()
@@ -150,13 +151,14 @@ class PDFGraphicState:
         obj.scolor = self.scolor
         obj.ncolor = self.ncolor
         obj.ocg = self.ocg
+        obj.ocg = self.ocg
         return obj
 
     def __repr__(self) -> str:
         return (
             "<PDFGraphicState: linewidth=%r, linecap=%r, linejoin=%r, "
             " miterlimit=%r, dash=%r, intent=%r, flatness=%r, "
-            " stroking color=%r, non stroking color=%r, ocg=%r>"
+            " stroking color=%r, non stroking color=%r, ocg=%r, ocg=%r>"
             % (
                 self.linewidth,
                 self.linecap,
@@ -781,7 +783,7 @@ class PDFPageInterpreter:
     def do_BDC(self, tag: PDFStackT, props: PDFStackT) -> None:
         """Begin marked-content sequence with property list"""
         self.device.begin_tag(cast(PSLiteral, tag), props)
-        # Set graphic state OCG (layer) attribute 
+        # Set graphic state OCG attribute 
         self.graphicstate.ocg = str(props).strip('/')
         return
 

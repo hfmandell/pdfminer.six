@@ -231,7 +231,6 @@ class LTCurve(LTComponent):
         non_stroking_color: Optional[Color] = None,
         original_path: Optional[List[PathSegment]] = None,
         dashing_style: Optional[Tuple[object, object]] = None,
-        ocg: str = None,
     ) -> None:
         LTComponent.__init__(self, get_bound(pts))
         self.pts = pts
@@ -243,8 +242,7 @@ class LTCurve(LTComponent):
         self.non_stroking_color = non_stroking_color
         self.original_path = original_path
         self.dashing_style = dashing_style
-        self.ocg = ocg
-        
+
     def get_pts(self) -> str:
         return ",".join("%.3f,%.3f" % p for p in self.pts)
 
